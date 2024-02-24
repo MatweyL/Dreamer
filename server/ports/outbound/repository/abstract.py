@@ -12,26 +12,19 @@ DOMAIN_MODEL_PK = TypeVar('DOMAIN_MODEL_PK', bound=BaseModel)
 ENTITY_MODEL = TypeVar('ENTITY_MODEL')
 
 
-class AbstractDomainEntityMapper(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_PK]):
+class AbstractDomainEntityMapper(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_PK], ABC):
 
-    def __init__(self, domain_model_input_class: Type[DOMAIN_MODEL_INPUT],
+    def __init__(self,
                  domain_model_class: Type[DOMAIN_MODEL],
                  domain_model_pk_class: Type[DOMAIN_MODEL_PK],
                  entity_model_class: Type[ENTITY_MODEL]):
-        self._domain_model_input_class = domain_model_input_class
         self._domain_model_class = domain_model_class
         self._domain_model_pk_class = domain_model_pk_class
         self._entity_model_class = entity_model_class
 
-    def domain_model_input(self, obj) -> DOMAIN_MODEL_INPUT:
-        if isinstance(obj, self._domain_model_input_class):
-            return obj
-        return self._domain_model_input_class.model_validate(obj)
-
-    def domain_model(self, obj) -> DOMAIN_MODEL:
-        if isinstance(obj, self._domain_model_class):
-            return obj
-        return self._entity_to_domain_model(obj)
+    @abstractmethod
+    def domain_model(self, obj: ENTITY_MODEL) -> DOMAIN_MODEL:
+        pass
 
     def domain_model_pk(self, obj) -> DOMAIN_MODEL_PK:
         if isinstance(obj, self._domain_model_pk_class):
@@ -39,18 +32,11 @@ class AbstractDomainEntityMapper(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAI
         return self._domain_model_pk_class.model_validate(obj)
 
     @abstractmethod
-    def _entity_to_domain_model(self, obj: Type[ENTITY_MODEL]):
-        pass
-
-    @abstractmethod
-    def entity_model(self, obj) -> ENTITY_MODEL:
+    def entity_model(self, obj: DOMAIN_MODEL) -> ENTITY_MODEL:
         pass
 
 
-class AbstractRepository(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_PK], ABC):
-
-    def __init__(self, domain_mapper: AbstractDomainEntityMapper):
-        self._domain_mapper = domain_mapper
+class AbstractRepository(AbstractDomainEntityMapper, ABC):
 
     @abstractmethod
     async def create(self, domain_model_input: DOMAIN_MODEL_INPUT) -> DOMAIN_MODEL:

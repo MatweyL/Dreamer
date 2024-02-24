@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List, Optional, Type
 
 from sqlalchemy import select, desc, inspect, delete, update, func
@@ -5,40 +6,39 @@ from sqlalchemy import select, desc, inspect, delete, update, func
 from server.adapters.outbound.repository.orm_sqlalchemy.base import Base
 from server.adapters.outbound.repository.orm_sqlalchemy.unit_of_work import UnitOfWork
 from server.ports.outbound.repository.abstract import AbstractRepository, DOMAIN_MODEL, DOMAIN_MODEL_PK, \
-    DOMAIN_MODEL_INPUT, AbstractDomainEntityMapper
+    DOMAIN_MODEL_INPUT
 from server.ports.outbound.repository.queries import FilterFields, PaginationQuery, UpdateFields
 
 
-class SQLAlchemyRepository(AbstractRepository):
-
-    def __init__(self, domain_mapper: AbstractDomainEntityMapper,
-                 unit_of_work: UnitOfWork, entity_model_class: Type[Base]):
-        super().__init__(domain_mapper)
+class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
+    
+    def __init__(self, domain_model_class: Type[DOMAIN_MODEL], domain_model_pk_class: Type[DOMAIN_MODEL_PK],
+                 entity_model_class: Type[Base], unit_of_work: UnitOfWork):
+        super().__init__(domain_model_class, domain_model_pk_class, entity_model_class)
         self._uow = unit_of_work
-        self._entity_model_class = entity_model_class
-
+        
     async def create(self, domain_model_input: DOMAIN_MODEL_INPUT) -> DOMAIN_MODEL:
         async with self._uow as uow:
-            entity_model = self._domain_mapper.entity_model(domain_model_input)
+            entity_model = self.entity_model(domain_model_input)
             uow.session.add(entity_model)
             await uow.commit()
-            domain_model = self._domain_mapper.domain_model(entity_model)
+            domain_model = self.domain_model(entity_model)
             return domain_model
 
     async def get(self, domain_model_pk: DOMAIN_MODEL_PK) -> Optional[DOMAIN_MODEL]:
         async with self._uow as uow:
-            valid_domain_model_pk = self._domain_mapper.domain_model_pk(domain_model_pk)
+            valid_domain_model_pk = self.domain_model_pk(domain_model_pk)
             query = select(self._entity_model_class).filter_by(**valid_domain_model_pk.model_dump())
             result = await uow.session.scalar(query)
             entity_model = result.first()
             if not entity_model:
                 return None
-            domain_model = self._domain_mapper.domain_model(entity_model)
+            domain_model = self.domain_model(entity_model)
             return domain_model
 
     async def update(self, domain_model_pk: DOMAIN_MODEL_PK, update_fields: UpdateFields) -> DOMAIN_MODEL:
         async with self._uow as uow:
-            valid_domain_model_pk = self._domain_mapper.domain_model_pk(domain_model_pk)
+            valid_domain_model_pk = self.domain_model_pk(domain_model_pk)
             query = (update(self._entity_model_class).filter_by(**valid_domain_model_pk.model_dump())
                      .values(**update_fields.dict())).returning(self._entity_model_class)
             result = await uow.session.scalar(query)
@@ -46,7 +46,7 @@ class SQLAlchemyRepository(AbstractRepository):
             entity_model = result.first()
             if not entity_model:
                 return None
-            domain_model = self._domain_mapper.domain_model(entity_model)
+            domain_model = self.domain_model(entity_model)
             return domain_model
 
     async def delete(self, domain_model_pk: DOMAIN_MODEL_PK) -> Optional[DOMAIN_MODEL]:
@@ -59,7 +59,7 @@ class SQLAlchemyRepository(AbstractRepository):
             entity_model = result.first()
             if not entity_model:
                 return None
-            domain_model = self._domain_mapper.domain_model(entity_model)
+            domain_model = self.domain_model(entity_model)
             return domain_model
 
     async def paginated(self, pagination: PaginationQuery) -> List[DOMAIN_MODEL]:
@@ -86,14 +86,14 @@ class SQLAlchemyRepository(AbstractRepository):
 
             result = await uow.session.execute(query)
             entity_models = result.scalars().all()
-            return [self._domain_mapper.domain_model(entity_model) for entity_model in entity_models]
+            return [self.domain_model(entity_model) for entity_model in entity_models]
 
     async def filter(self, filter_fields: FilterFields) -> List[DOMAIN_MODEL]:
         async with self._uow as uow:
             query = select(self._entity_model_class).filter_by(**filter_fields.dict())
             result = await uow.session.scalars(query)
             entity_models = result.all()
-            return [self._domain_mapper.domain_model(entity_model) for entity_model in entity_models]
+            return [self.domain_model(entity_model) for entity_model in entity_models]
 
     async def count_by_fields(self, filter_fields: FilterFields) -> int:
         async with self._uow as uow:
