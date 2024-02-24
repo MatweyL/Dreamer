@@ -31,3 +31,4 @@ class TaskStatusLogPK(BaseModel):
 class TaskStatusLog(TaskStatusLogPK):
     status: TaskStatus
     description: str
+

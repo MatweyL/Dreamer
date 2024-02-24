@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, Dict
 from uuid import UUID
 
 from pydantic import BaseModel
 
-from server.domain.schemas.task import Task, TaskTypePK
+from server.domain.schemas.task import Task, TaskTypePK, TaskPK
 
 
 class PipelinePK(BaseModel):  # объект Primary Key не должен содержать вложенных объектов
@@ -38,5 +38,9 @@ class PipelineStepPK(BaseModel):
 
 class PipelineStep(PipelineStepPK):
     pipeline_execution: PipelineExecutionPK
-    previous_task: Optional[Task] = None
-    current_task: Optional[Task] = None
+    previous_task: Optional[TaskPK] = None
+    current_task: Optional[TaskPK] = None
+
+
+class PipelineInput(BaseModel):
+    task_input: Dict
