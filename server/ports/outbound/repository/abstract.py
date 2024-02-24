@@ -12,7 +12,7 @@ DOMAIN_MODEL_PK = TypeVar('DOMAIN_MODEL_PK', bound=BaseModel)
 ENTITY_MODEL = TypeVar('ENTITY_MODEL')
 
 
-class AbstractDomainEntityMapper(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_PK], ABC):
+class AbstractDomainEntityMapper(ABC):
 
     def __init__(self,
                  domain_model_class: Type[DOMAIN_MODEL],
@@ -27,16 +27,15 @@ class AbstractDomainEntityMapper(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAI
         pass
 
     def domain_model_pk(self, obj) -> DOMAIN_MODEL_PK:
-        if isinstance(obj, self._domain_model_pk_class):
-            return obj
-        return self._domain_model_pk_class.model_validate(obj)
+        return self._domain_model_pk_class(**obj.model_dump())
 
     @abstractmethod
     def entity_model(self, obj: DOMAIN_MODEL) -> ENTITY_MODEL:
         pass
 
 
-class AbstractRepository(AbstractDomainEntityMapper, ABC):
+class AbstractRepository(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_PK],
+                         AbstractDomainEntityMapper, ABC):
 
     @abstractmethod
     async def create(self, domain_model_input: DOMAIN_MODEL_INPUT) -> DOMAIN_MODEL:

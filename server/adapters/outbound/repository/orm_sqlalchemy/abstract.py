@@ -29,8 +29,7 @@ class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
         async with self._uow as uow:
             valid_domain_model_pk = self.domain_model_pk(domain_model_pk)
             query = select(self._entity_model_class).filter_by(**valid_domain_model_pk.model_dump())
-            result = await uow.session.scalar(query)
-            entity_model = result.first()
+            entity_model = await uow.session.scalar(query)
             if not entity_model:
                 return None
             domain_model = self.domain_model(entity_model)
@@ -41,9 +40,8 @@ class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
             valid_domain_model_pk = self.domain_model_pk(domain_model_pk)
             query = (update(self._entity_model_class).filter_by(**valid_domain_model_pk.model_dump())
                      .values(**update_fields.dict())).returning(self._entity_model_class)
-            result = await uow.session.scalar(query)
+            entity_model = await uow.session.scalar(query)
             await uow.commit()
-            entity_model = result.first()
             if not entity_model:
                 return None
             domain_model = self.domain_model(entity_model)
@@ -51,12 +49,12 @@ class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
 
     async def delete(self, domain_model_pk: DOMAIN_MODEL_PK) -> Optional[DOMAIN_MODEL]:
         async with self._uow as uow:
+            valid_domain_model_pk = self.domain_model_pk(domain_model_pk)
             query = (delete(self._entity_model_class)
-                     .filter_by(**domain_model_pk.model_dump())
+                     .filter_by(**valid_domain_model_pk.model_dump())
                      .returning(self._entity_model_class))
-            result = await uow.session.scalar(query)
+            entity_model = await uow.session.scalar(query)
             await uow.commit()
-            entity_model = result.first()
             if not entity_model:
                 return None
             domain_model = self.domain_model(entity_model)
@@ -84,15 +82,13 @@ class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
             if pagination.filter_fields:
                 query = query.filter_by(**pagination.filter_fields.dict())
 
-            result = await uow.session.execute(query)
-            entity_models = result.scalars().all()
+            entity_models = await uow.session.scalars(query)
             return [self.domain_model(entity_model) for entity_model in entity_models]
 
     async def filter(self, filter_fields: FilterFields) -> List[DOMAIN_MODEL]:
         async with self._uow as uow:
             query = select(self._entity_model_class).filter_by(**filter_fields.dict())
-            result = await uow.session.scalars(query)
-            entity_models = result.all()
+            entity_models = await uow.session.scalars(query)
             return [self.domain_model(entity_model) for entity_model in entity_models]
 
     async def count_by_fields(self, filter_fields: FilterFields) -> int:
