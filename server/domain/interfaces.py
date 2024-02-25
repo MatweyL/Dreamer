@@ -34,3 +34,10 @@ class TaskServiceInterface(ABC):
 
 class TaskStatusLogService(ABC):
     pass
+
+
+class TaskInputServiceInterface(ABC):
+
+    @abstractmethod
+    async def create(self, task: Task, input_task_input):
+        pass

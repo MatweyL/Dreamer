@@ -2,7 +2,6 @@ from typing import Optional, Dict
 from uuid import UUID
 
 from pydantic import BaseModel
-
 from server.domain.schemas.task import Task, TaskTypePK, TaskPK
 
 

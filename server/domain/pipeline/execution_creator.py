@@ -1,7 +1,7 @@
 from typing import List, Dict
 from uuid import uuid4
 
-from server.domain.interfaces import TaskServiceInterface
+from server.domain.interfaces import TaskServiceInterface, TaskInputServiceInterface
 from server.domain.schemas.pipeline import PipelinePK, PipelineStepTemplate, PipelineStep, PipelineExecution
 from server.domain.schemas.task import TaskTypePK, Task
 from server.ports.outbound.repository.domain.pipeline import AbstractPipelineStepTemplateRepository, \
@@ -15,7 +15,7 @@ class PipelineExecutionCreator:
                  pipeline_execution_repo: AbstractPipelineExecutionRepository,
                  pipeline_step_repo: AbstractPipelineStepRepository,
                  task_service: TaskServiceInterface,
-                 task_input_service):
+                 task_input_service: TaskInputServiceInterface):
         self._pipeline_step_template_repo = pipeline_step_template_repo
         self._pipeline_execution_repo = pipeline_execution_repo
         self._pipeline_step_repo = pipeline_step_repo

@@ -9,6 +9,12 @@ from server.domain.schemas.enums import TaskStatus
 class TaskTypePK(BaseModel):
     uid: UUID
 
+    def __eq__(self, other):
+        return self.uid == other.uid
+
+    def __hash__(self):
+        return hash(self.uid)
+
 
 class TaskType(TaskTypePK):
     name: str
