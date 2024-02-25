@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from server.domain.schemas.enums import TaskStatus
+from server.domain.schemas.enums import TaskStatus, TaskTypes
 
 
 class TaskTypePK(BaseModel):
@@ -17,7 +17,7 @@ class TaskTypePK(BaseModel):
 
 
 class TaskType(TaskTypePK):
-    name: str
+    name: TaskTypes
 
 
 class TaskPK(BaseModel):

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, UUID, ForeignKey, Enum, DateTime
 
 from server.adapters.outbound.repository.orm_sqlalchemy.base import Base, TablenameMixin, UUIDMixin, LoadTimestampMixin
-from server.domain.schemas import TaskStatus
+from server.domain.schemas import TaskStatus, TaskTypes
 
 
 class Pipeline(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
@@ -9,9 +9,9 @@ class Pipeline(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
 
 
 class PipelineStepTemplate(Base, TablenameMixin, LoadTimestampMixin):
-    pipeline_uid = Column(UUID(as_uuid=True), ForeignKey('pipeline.uid'), nullable=False)
+    pipeline_uid = Column(UUID(as_uuid=True), ForeignKey('pipeline.uid'), primary_key=True)
     previous_task_type_uid = Column(UUID(as_uuid=True), ForeignKey('task_type.uid'))
-    current_task_type_uid = Column(UUID(as_uuid=True), ForeignKey('task_type.uid'))
+    current_task_type_uid = Column(UUID(as_uuid=True), ForeignKey('task_type.uid'), primary_key=True)
 
 
 class PipelineExecution(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
@@ -20,12 +20,12 @@ class PipelineExecution(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
 
 class PipelineStep(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
     pipeline_execution_uid = Column(UUID(as_uuid=True), ForeignKey('pipeline_execution.uid'), nullable=False)
-    previous_task_uid = Column(UUID(as_uuid=True), ForeignKey('pipeline_execution.uid'))
-    current_task_uid = Column(UUID(as_uuid=True), ForeignKey('pipeline_execution.uid'), nullable=False)
+    previous_task_uid = Column(UUID(as_uuid=True), ForeignKey('task.uid'))
+    current_task_uid = Column(UUID(as_uuid=True), ForeignKey('task.uid'), nullable=False)
 
 
 class TaskType(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
-    name = Column(String(128), nullable=False, unique=True)
+    name = Column(Enum(TaskTypes), nullable=False, unique=True)
 
 
 class Task(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
