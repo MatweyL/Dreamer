@@ -10,7 +10,7 @@ class TaskStatus(str, enum.Enum):
 
 
 class FieldTypes(str, enum.Enum):
-    INT = "INT"
+    INT = "INTEGER"
     FLOAT = "FLOAT"
     STRING = "STRING"
     DATETIME = "DATETIME"

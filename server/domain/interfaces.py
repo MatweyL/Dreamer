@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from server.domain.schemas.task import TaskTypePK, Task
+from server.domain.schemas.task import TaskTypePK, Task, TaskDataBody, TaskData, TaskPK
 
 
 class PipelineService(ABC):
@@ -34,8 +34,8 @@ class TaskStatusLogService(ABC):
     pass
 
 
-class TaskInputServiceInterface(ABC):
+class TaskDataServiceInterface(ABC):
 
     @abstractmethod
-    async def create(self, task: Task, input_task_input):
+    async def create(self, task: TaskPK, body: TaskDataBody, is_input: bool) -> TaskData:
         pass

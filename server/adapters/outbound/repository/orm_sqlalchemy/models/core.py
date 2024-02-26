@@ -49,7 +49,7 @@ class TaskDataTemplate(Base, TablenameMixin, LoadTimestampMixin):
 
 
 class TaskData(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
-    task_uid = Column(UUID(as_uuid=True), ForeignKey('task.uid'), primary_key=True)
+    task_uid = Column(UUID(as_uuid=True), ForeignKey('task.uid'))
     field_name = Column(String(64), nullable=False)
     field_type = Column(Enum(FieldTypes), nullable=False)
     field_value = Column(TEXT, nullable=False)
