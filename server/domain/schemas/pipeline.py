@@ -1,11 +1,10 @@
-from typing import Optional, Dict, Type
+from typing import Optional, Dict
 from uuid import UUID
 
 from pydantic import BaseModel
 
-from server.domain.schemas.task import TaskTypes
+from server.domain.schemas import FieldTypes
 from server.domain.schemas.task import TaskTypePK, TaskPK
-from server.domain.schemas.task_input import InputTaskInput, InputVideoToTextInput, InputTextToImageInput
 
 
 class PipelinePK(BaseModel):  # объект Primary Key не должен содержать вложенных объектов
@@ -45,12 +44,15 @@ class PipelineStep(PipelineStepPK):
 
 
 class PipelineInput(BaseModel):
-    task_input_by_type: Dict[TaskTypes, InputTaskInput]
+    task_input_by_type: Dict[int, int]
 
 
-if __name__ == "__main__":
-    pi = PipelineInput(task_input_by_type={
-        TaskTypes.EXTRACT_VIDEO_DESCRIPTION: InputVideoToTextInput(),
-        TaskTypes.GENERATE_IMAGE_FROM_TEXT: InputTextToImageInput()
-    })
-    print(pi)
+class TaskDataTemplatePK(BaseModel):
+    is_input: bool
+    field_name: str
+    task_type_uid: UUID
+
+
+class TaskDataTemplate(TaskDataTemplatePK):
+    field_type: FieldTypes
+    is_list: bool

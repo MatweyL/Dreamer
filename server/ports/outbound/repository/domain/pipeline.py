@@ -1,7 +1,7 @@
 from abc import ABC
 
 from server.domain.schemas.pipeline import Pipeline, PipelineStepTemplate, PipelineExecution, PipelineStepTemplatePK, \
-    PipelineStep, PipelinePK, PipelineExecutionPK, PipelineStepPK
+    PipelineStep, PipelinePK, PipelineExecutionPK, PipelineStepPK, TaskDataTemplate, TaskDataTemplatePK
 from server.ports.outbound.repository.abstract import AbstractRepository
 
 
@@ -23,4 +23,9 @@ class AbstractPipelineExecutionRepository(AbstractRepository[PipelineExecution,
 
 
 class AbstractPipelineStepRepository(AbstractRepository[PipelineStep, PipelineStep, PipelineStepPK], ABC):
+    pass
+
+
+class AbstractTaskDataTemplateRepository(AbstractRepository[TaskDataTemplate, TaskDataTemplate, TaskDataTemplatePK],
+                                         ABC):
     pass

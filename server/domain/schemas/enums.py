@@ -9,7 +9,8 @@ class TaskStatus(str, enum.Enum):
     ERROR = "ERROR"
 
 
-class TaskTypes(str, enum.Enum):
-    DOWNLOAD_VIDEO = "DOWNLOAD_VIDEO"
-    EXTRACT_VIDEO_DESCRIPTION = "EXTRACT_VIDEO_DESCRIPTION"
-    GENERATE_IMAGE_FROM_TEXT = "GENERATE_IMAGE_FROM_TEXT"
+class FieldTypes(str, enum.Enum):
+    INT = "INT"
+    FLOAT = "FLOAT"
+    STRING = "STRING"
+    DATETIME = "DATETIME"

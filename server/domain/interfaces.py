@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 
-from server.domain.schemas.pipeline import PipelinePK
 from server.domain.schemas.task import TaskTypePK, Task
-from server.domain.schemas.task_input import InputTaskInput
 
 
 class PipelineService(ABC):

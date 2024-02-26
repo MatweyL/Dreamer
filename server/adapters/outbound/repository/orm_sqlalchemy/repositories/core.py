@@ -3,9 +3,10 @@ from server.adapters.outbound.repository.orm_sqlalchemy.abstract import Abstract
 from server.domain import schemas
 from server.domain.schemas import PipelinePK, TaskTypePK, PipelineExecutionPK, TaskPK
 from server.ports.outbound.repository.domain.pipeline import AbstractPipelineRepository, \
-    AbstractPipelineStepTemplateRepository, AbstractPipelineExecutionRepository, AbstractPipelineStepRepository
+    AbstractPipelineStepTemplateRepository, AbstractPipelineExecutionRepository, AbstractPipelineStepRepository, \
+    AbstractTaskDataTemplateRepository
 from server.ports.outbound.repository.domain.task import AbstractTaskTypeRepository, AbstractTaskRepository, \
-    AbstractTaskStatusLogRepository
+    AbstractTaskStatusLogRepository, AbstractTaskDataRepository
 
 
 class PipelineSQLAlchemyRepository(AbstractPipelineRepository, AbstractSQLAlchemyRepository):
@@ -85,3 +86,42 @@ class TaskStatusLogSQLAlchemyRepository(AbstractTaskStatusLogRepository, Abstrac
     def entity_model(self, obj: schemas.TaskStatusLog) -> models.TaskStatusLog:
         return models.TaskStatusLog(task_uid=obj.task_uid, created_timestamp=obj.created_timestamp,
                                     description=obj.description)
+
+
+class TaskDataTemplateSQLAlchemyRepository(AbstractTaskDataTemplateRepository, AbstractSQLAlchemyRepository):
+    def domain_model(self, obj: models.TaskDataTemplate) -> schemas.TaskDataTemplate:
+        return schemas.TaskDataTemplate(is_input=obj.is_input,
+                                        field_name=obj.field_name,
+                                        task_type_uid=obj.task_type_uid,
+                                        field_type=obj.field_type,
+                                        is_list=obj.is_list
+
+                                        )
+
+    def entity_model(self, obj: schemas.TaskDataTemplate) -> models.TaskDataTemplate:
+        return models.TaskDataTemplate(is_input=obj.is_input,
+                                       field_name=obj.field_name,
+                                       task_type_uid=obj.task_type_uid,
+                                       field_type=obj.field_type,
+                                       is_list=obj.is_list
+                                       )
+
+
+class TaskDataSQLAlchemyRepository(AbstractTaskDataRepository, AbstractSQLAlchemyRepository):
+    def domain_model(self, obj: models.TaskData) -> schemas.TaskData:
+        return schemas.TaskData(is_input=obj.is_input,
+                                field_name=obj.field_name,
+                                task=TaskPK(uid=obj.task_uid),
+                                field_type=obj.field_type,
+                                is_list=obj.is_list,
+                                field_value=obj.field_value
+                                )
+
+    def entity_model(self, obj: schemas.TaskData) -> models.TaskData:
+        return models.TaskData(is_input=obj.is_input,
+                               field_name=obj.field_name,
+                               task_uid=obj.task.uid,
+                               field_type=obj.field_type,
+                               is_list=obj.is_list,
+                               field_value=obj.field_value
+                               )
