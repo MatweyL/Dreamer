@@ -62,5 +62,9 @@ class AbstractRepository(Generic[DOMAIN_MODEL, DOMAIN_MODEL_INPUT, DOMAIN_MODEL_
         raise NotImplementedError
 
     @abstractmethod
+    async def filter_one(self, filter_fields: FilterFields) -> Optional[DOMAIN_MODEL]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def count_by_fields(self, filter_fields: FilterFields) -> int:
         raise NotImplementedError

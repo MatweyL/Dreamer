@@ -91,6 +91,11 @@ class AbstractSQLAlchemyRepository(AbstractRepository, ABC):
             entity_models = await uow.session.scalars(query)
             return [self.domain_model(entity_model) for entity_model in entity_models]
 
+    async def filter_one(self, filter_fields: FilterFields) -> Optional[DOMAIN_MODEL]:
+        domain_models = await self.filter(filter_fields)
+        if domain_models:
+            return domain_models[0]
+
     async def count_by_fields(self, filter_fields: FilterFields) -> int:
         async with self._uow as uow:
             query = select(func.count()).select_from(self._entity_model_class)
