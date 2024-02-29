@@ -44,7 +44,7 @@ class TaskDataPK(BaseModel):
     uid: UUID
 
 
-def from_str_field_type(value: str):
+def from_str_to_field_type(value: str):
     return FieldTypes(value)
 
 
@@ -54,9 +54,22 @@ def from_any_to_str(value: Any):
 
 class TaskDataBody(BaseModel):
     field_name: str
-    field_type: Annotated[FieldTypes, BeforeValidator(from_str_field_type)]
-    field_value: Annotated[str, BeforeValidator(from_any_to_str)]
+    field_type: Annotated[FieldTypes, BeforeValidator(from_str_to_field_type)]
+    field_value_int: Optional[int] = None
+    field_value_float: Optional[float] = None
+    field_value_str: Optional[str] = None
+    field_value_datetime: Optional[datetime] = None
     is_list: bool
+
+    @property
+    def field_value(self):
+        if self.field_type == FieldTypes.INT:
+            return self.field_value_int
+        elif self.field_type == FieldTypes.FLOAT:
+            return self.field_value_float
+        elif self.field_type == FieldTypes.DATETIME:
+            return self.field_value_datetime
+        return self.field_value_str
 
 
 class TaskData(TaskDataPK, TaskDataBody):

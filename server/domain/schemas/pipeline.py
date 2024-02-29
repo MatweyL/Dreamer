@@ -40,7 +40,7 @@ class PipelineStepPK(BaseModel):
 class PipelineStep(PipelineStepPK):
     pipeline_execution: PipelineExecutionPK
     previous_task: Optional[TaskPK] = None
-    current_task: Optional[TaskPK] = None
+    current_task: TaskPK
 
 
 class PipelineInput(BaseModel):

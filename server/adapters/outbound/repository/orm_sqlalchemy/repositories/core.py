@@ -118,7 +118,10 @@ class TaskDataSQLAlchemyRepository(AbstractTaskDataRepository, AbstractSQLAlchem
                                 task=TaskPK(uid=obj.task_uid),
                                 field_type=obj.field_type,
                                 is_list=obj.is_list,
-                                field_value=obj.field_value
+                                field_value_int=obj.field_value_int,
+                                field_value_float=obj.field_value_float,
+                                field_value_str=obj.field_value_str,
+                                field_value_datetime=obj.field_value_datetime
                                 )
 
     def entity_model(self, obj: schemas.TaskData) -> models.TaskData:
@@ -128,5 +131,8 @@ class TaskDataSQLAlchemyRepository(AbstractTaskDataRepository, AbstractSQLAlchem
                                task_uid=obj.task.uid,
                                field_type=obj.field_type,
                                is_list=obj.is_list,
-                               field_value=obj.field_value
+                               field_value_int=obj.field_value_int,
+                               field_value_float=obj.field_value_float,
+                               field_value_str=obj.field_value_str,
+                               field_value_datetime=obj.field_value_datetime
                                )

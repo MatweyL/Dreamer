@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, UUID, ForeignKey, Enum, DateTime, Boolean, TEXT
+from sqlalchemy import Column, String, UUID, ForeignKey, Enum, DateTime, Boolean, TEXT, Integer, Float
 
 from server.adapters.outbound.repository.orm_sqlalchemy.base import Base, TablenameMixin, UUIDMixin, LoadTimestampMixin
 from server.domain.schemas import TaskStatus, FieldTypes
@@ -52,6 +52,9 @@ class TaskData(Base, TablenameMixin, UUIDMixin, LoadTimestampMixin):
     task_uid = Column(UUID(as_uuid=True), ForeignKey('task.uid'))
     field_name = Column(String(64), nullable=False)
     field_type = Column(Enum(FieldTypes), nullable=False)
-    field_value = Column(TEXT, nullable=False)
+    field_value_str = Column(TEXT)
+    field_value_int = Column(Integer)
+    field_value_float = Column(Float)
+    field_value_datetime = Column(DateTime)
     is_input = Column(Boolean, nullable=False)
     is_list = Column(Boolean, nullable=False)
