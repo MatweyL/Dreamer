@@ -45,6 +45,8 @@ class TaskDataTemplate(Base, TablenameMixin, LoadTimestampMixin):
     field_name = Column(String(64), primary_key=True)
     is_input = Column(Boolean, primary_key=True)
     field_type = Column(Enum(FieldTypes), nullable=False)
+    default_value = Column(TEXT, default=None)
+    is_required = Column(Boolean, nullable=True)
     is_list = Column(Boolean, nullable=False)
 
 

@@ -1,10 +1,4 @@
-
-from uuid import UUID
-
 import pytest
-
-from server.domain.schemas import PipelinePK
-from server.ports.outbound.repository.queries import FilterFields, Field
 
 
 @pytest.mark.asyncio

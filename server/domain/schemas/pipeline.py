@@ -59,3 +59,6 @@ class TaskDataTemplatePK(BaseModel):
 class TaskDataTemplate(TaskDataTemplatePK):
     field_type: FieldTypes
     is_list: bool
+    is_required: Optional[bool] = None
+    default_value: Optional[str] = None
+

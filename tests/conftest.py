@@ -70,8 +70,8 @@ def task_status_log_repo(unit_of_work):
 
 
 @pytest.fixture(scope='session')
-def task_service(task_repo, task_status_log_repo):
-    return TaskService(task_repo, task_status_log_repo)
+def task_service(task_repo, task_status_log_repo, task_data_service):
+    return TaskService(task_repo, task_status_log_repo, task_data_service)
 
 
 @pytest.fixture(scope='session')
@@ -96,20 +96,20 @@ def pipeline_input():
         UUID('00008888-5157-45e3-a6c0-0901d6c292a0'): [{
             "field_name": "internal_url",
             "field_type": "STRING",
-            "field_value": "https://mock.com/mp4.mp4",
+            "field_value_str": "https://mock.com/mp4.mp4",
             "is_list": False
         }],
         UUID('11118888-5157-45e3-a6c0-0901d6c292a0'): [{
             "field_name": "text_size",
             "field_type": "INTEGER",
-            "field_value": 3200,
+            "field_value_int": 3200,
             "is_list": False
         }],
         UUID('22228888-5157-45e3-a6c0-0901d6c292a0'): [
             {
                 "field_name": "style",
                 "field_type": "STRING",
-                "field_value": "cyberpunk",
+                "field_value_str": "cyberpunk",
                 "is_list": False
             }]
     }

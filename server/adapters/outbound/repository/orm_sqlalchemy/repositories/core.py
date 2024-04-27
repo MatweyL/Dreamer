@@ -97,8 +97,9 @@ class TaskDataTemplateSQLAlchemyRepository(AbstractTaskDataTemplateRepository, A
                                         field_name=obj.field_name,
                                         task_type_uid=obj.task_type_uid,
                                         field_type=obj.field_type,
-                                        is_list=obj.is_list
-
+                                        is_list=obj.is_list,
+                                        default_value=obj.default_value,
+                                        is_required=obj.is_required,
                                         )
 
     def entity_model(self, obj: schemas.TaskDataTemplate) -> models.TaskDataTemplate:
@@ -106,7 +107,9 @@ class TaskDataTemplateSQLAlchemyRepository(AbstractTaskDataTemplateRepository, A
                                        field_name=obj.field_name,
                                        task_type_uid=obj.task_type_uid,
                                        field_type=obj.field_type,
-                                       is_list=obj.is_list
+                                       is_list=obj.is_list,
+                                       default_value=obj.default_value,
+                                       is_required=obj.is_required,
                                        )
 
 

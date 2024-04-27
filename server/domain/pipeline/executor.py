@@ -22,10 +22,12 @@ class PipelineExecutor:
     def __init__(self,
                  pipeline_step_repo: AbstractPipelineStepRepository,
                  task_repo: AbstractTaskRepository,
-                 full_pipeline_step_builder: FullPipelineStepBuilderInterface):
+                 full_pipeline_step_builder: FullPipelineStepBuilderInterface,
+                 pipeline_step_producer):
         self._pipeline_step_repo = pipeline_step_repo
         self._task_repo = task_repo
         self._full_pipeline_step_builder = full_pipeline_step_builder
+        self._pipeline_step_producer = pipeline_step_producer
 
     async def get_pipeline_state(self, pipeline_execution: PipelineExecution) -> PipelineState:
         is_finished = False
@@ -61,5 +63,9 @@ class PipelineExecutor:
 
     async def run_pipeline_step(self, pipeline_execution: PipelineExecution):
         pipeline_state = await self.get_pipeline_state(pipeline_execution)
+        logger.info(pipeline_state)
         if pipeline_state.can_execute_step:
+            logger.info('produce pipeline step for execution')
             full_pipeline_step = await self._full_pipeline_step_builder.build(pipeline_state.step_to_execute)
+            await self._pipeline_step_producer.produce(full_pipeline_step)
+
