@@ -1,16 +1,20 @@
 import asyncio
+import json
 from typing import Optional
 
 from aio_pika import Message, connect_robust
-from aio_pika.abc import AbstractExchange, AbstractConnection, AbstractChannel, AbstractQueue
+from aio_pika.abc import AbstractExchange, AbstractConnection
 
+from server.domain.schemas.full import FullPipelineStep
 from server.ports.outbound import QueueProducerInterface
+from server.ports.outbound.main import PipelineStepProducerI
 from .utils import _build_connection_url
 
 try:
     from server.common.logs import logger
 except ImportError:
     import logging
+
     logger = logging
     logger.warning('failed to import project logger; use default logging')
 
@@ -53,7 +57,7 @@ class RabbitProducer(QueueProducerInterface):
         while current_retry < self._produce_max_retries:
             try:
                 await self._exchange.publish(Message(body=body,
-                                                     correlation_id=correlation_id,),
+                                                     correlation_id=correlation_id, ),
                                              routing_key=routing_key)
             except BaseException as e:
                 logger.error(f'{self} retry: [{current_retry}|{self._produce_max_retries}]; '
@@ -64,3 +68,16 @@ class RabbitProducer(QueueProducerInterface):
                 logger.debug(f'{self} successfully produced task to {routing_key}')
                 break
 
+
+class RMQPipelineStepProducer(PipelineStepProducerI):
+
+    def __init__(self, rabbit_producer: RabbitProducer):
+        self._rabbit_producer = rabbit_producer
+
+    async def produce(self, full_pipeline_step: FullPipelineStep):
+        task = full_pipeline_step.current_task
+        if full_pipeline_step.previous_task:
+            for task_data in full_pipeline_step.previous_task.data_output:
+                task.data_input.append(task_data)
+        encoded_task: bytes = json.dumps(task.model_dump(), default=str, indent=2)
+        await self._rabbit_producer.produce(encoded_task, None, task.type.name)

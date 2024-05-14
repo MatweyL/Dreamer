@@ -62,3 +62,9 @@ class TaskDataTemplate(TaskDataTemplatePK):
     is_required: Optional[bool] = None
     default_value: Optional[str] = None
 
+
+class PipelineState(BaseModel):
+    in_progress: bool
+    is_finished: bool
+    can_execute_step: bool
+    step_to_execute: Optional[PipelineStep]

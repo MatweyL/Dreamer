@@ -3,27 +3,20 @@ from typing import Optional
 from pydantic import BaseModel
 
 from server.common.logs import logger
-from server.domain.interfaces import FullPipelineStepBuilderInterface
-from server.domain.schemas import PipelineExecution, TaskStatus, PipelineStep
+from server.domain.interfaces import FullPipelineStepBuilderInterface, PipelineExecutorI
+from server.domain.schemas import PipelineExecution, TaskStatus, PipelineStep, PipelineState
 from server.ports.outbound.repository.domain.pipeline import AbstractPipelineStepRepository
 from server.ports.outbound.repository.domain.task import AbstractTaskRepository
 from server.ports.outbound.repository.queries import FilterFields, Field
 
 
-class PipelineState(BaseModel):
-    in_progress: bool
-    is_finished: bool
-    can_execute_step: bool
-    step_to_execute: Optional[PipelineStep]
-
-
-class PipelineExecutor:
+class PipelineExecutor(PipelineExecutorI):
 
     def __init__(self,
                  pipeline_step_repo: AbstractPipelineStepRepository,
                  task_repo: AbstractTaskRepository,
                  full_pipeline_step_builder: FullPipelineStepBuilderInterface,
-                 pipeline_step_producer):
+                 pipeline_step_producer: PipelineStepProducerI):
         self._pipeline_step_repo = pipeline_step_repo
         self._task_repo = task_repo
         self._full_pipeline_step_builder = full_pipeline_step_builder
@@ -65,7 +58,6 @@ class PipelineExecutor:
         pipeline_state = await self.get_pipeline_state(pipeline_execution)
         logger.info(pipeline_state)
         if pipeline_state.can_execute_step:
-            logger.info('produce pipeline step for execution')
+            logger.info(f'produce pipeline step {pipeline_state} for execution')
             full_pipeline_step = await self._full_pipeline_step_builder.build(pipeline_state.step_to_execute)
             await self._pipeline_step_producer.produce(full_pipeline_step)
-
